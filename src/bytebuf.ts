@@ -6,11 +6,14 @@ interface ByteBufOptions {
 /** A wrapper view for the DataView to read bytes. */
 export class ByteBuf {
   private dataView: DataView;
+  private textDecoder: TextDecoder;
+
   public byteOffset: number;
 
   constructor({ offset, buffer }: ByteBufOptions) {
     this.dataView = new DataView(buffer);
     this.byteOffset = offset || 0;
+    this.textDecoder = new TextDecoder();
   }
 
   get buffer(): ArrayBuffer {
@@ -68,6 +71,7 @@ export class ByteBuf {
     return value;
   }
 
+  /** just skip */
   skip(count: number) {
     this.byteOffset += count;
   }
@@ -87,7 +91,22 @@ export class ByteBuf {
     return arr;
   }
 
-  assertBytes(...bytes: number[]): boolean {
+  readSizedString(length: number): string {
+    const beginOffset = this.byteOffset;
+
+    for (let i = 0; i < length; i++) {
+      if (this.readUint8() === 0) break;
+    }
+
+    const stringValue = this.textDecoder.decode(
+      this.buffer.slice(beginOffset, this.byteOffset - 1),
+    );
+
+    this.byteOffset = beginOffset + length;
+    return stringValue;
+  }
+
+  assertBytes(bytes: number[]): boolean {
     for (const byte of bytes) {
       if (byte !== this.readUint8()) return false;
     }
