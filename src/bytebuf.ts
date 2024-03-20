@@ -1,0 +1,96 @@
+interface ByteBufOptions {
+  offset?: number;
+  buffer: ArrayBuffer;
+}
+
+/** A wrapper view for the DataView to read bytes. */
+export class ByteBuf {
+  private dataView: DataView;
+  public byteOffset: number;
+
+  constructor({ offset, buffer }: ByteBufOptions) {
+    this.dataView = new DataView(buffer);
+    this.byteOffset = offset || 0;
+  }
+
+  get buffer(): ArrayBuffer {
+    return this.dataView.buffer;
+  }
+
+  duplicate(offset?: number) {
+    return new ByteBuf({
+      offset: offset || this.byteOffset,
+      buffer: this.dataView.buffer,
+    });
+  }
+
+  /** meh... */
+  extend(buffer: Uint8Array) {
+    const newBuffer = new Uint8Array(
+      buffer.byteLength + this.buffer.byteLength,
+    );
+
+    newBuffer.set(new Uint8Array(this.dataView.buffer), 0);
+    newBuffer.set(buffer, this.buffer.byteLength);
+
+    this.dataView = new DataView(newBuffer.buffer);
+  }
+
+  readUint8(): number {
+    return this.dataView.getUint8(this.byteOffset++);
+  }
+
+  readInt8(): number {
+    return this.dataView.getInt8(this.byteOffset++);
+  }
+
+  readUint16(): number {
+    const value = this.dataView.getUint16(this.byteOffset);
+    this.byteOffset += 2;
+    return value;
+  }
+
+  readInt16(): number {
+    const value = this.dataView.getInt16(this.byteOffset);
+    this.byteOffset += 2;
+    return value;
+  }
+
+  readUint32(): number {
+    const value = this.dataView.getUint32(this.byteOffset);
+    this.byteOffset += 4;
+    return value;
+  }
+
+  readInt32(): number {
+    const value = this.dataView.getInt32(this.byteOffset);
+    this.byteOffset += 4;
+    return value;
+  }
+
+  skip(count: number) {
+    this.byteOffset += count;
+  }
+
+  readBuffer(length: number): ArrayBuffer {
+    const value = this.dataView.buffer.slice(
+      this.byteOffset,
+      this.byteOffset + length,
+    );
+    this.byteOffset += length;
+    return value;
+  }
+
+  readArray<T>(reader: () => T, length: number): T[] {
+    const arr = [];
+    for (; length > 0; length--) arr.push(reader());
+    return arr;
+  }
+
+  assertBytes(...bytes: number[]): boolean {
+    for (const byte of bytes) {
+      if (byte !== this.readUint8()) return false;
+    }
+    return true;
+  }
+}
