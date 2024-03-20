@@ -1,4 +1,6 @@
 export * as lead from "./src/lead.ts";
+export * as header from "./src/header.ts";
+
 export * from "./src/errors.ts";
 
 import { ByteBuf } from "./src/bytebuf.ts";

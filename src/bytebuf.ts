@@ -20,7 +20,7 @@ export class ByteBuf {
     return this.dataView.buffer;
   }
 
-  duplicate(offset?: number) {
+  duplicate(offset?: number): ByteBuf {
     return new ByteBuf({
       offset: offset || this.byteOffset,
       buffer: this.dataView.buffer,
@@ -104,6 +104,16 @@ export class ByteBuf {
 
     this.byteOffset = beginOffset + length;
     return stringValue;
+  }
+
+  readNullTerminatedString(): string {
+    const beginOffset = this.byteOffset;
+
+    while (this.readUint8() !== 0);
+
+    return this.textDecoder.decode(
+      this.buffer.slice(beginOffset, this.byteOffset - 1),
+    );
   }
 
   assertBytes(bytes: number[]): boolean {
