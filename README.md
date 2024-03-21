@@ -4,22 +4,42 @@ RPM v3 package metadata parser in TypeScript for use in any environment.
 
 #### Features
 
-- **Get only what you want**. You can specify the tags you need to speed up the
-  parsing.
-- **You're reading while you're reading**. Use the Streams API for continuous
-  parsing.
+- Stream parsing based on
+  [Streams API](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API).
+- Partial parsing of Header.
 
-## Installation
+## Get Started
 
-For Deno.
+For [Deno](https://deno.land).
 
 ```ts
-import * as rpm from "...";
+import { parseRpmMetadata } from "..";
 ```
 
-## How to use?
+High-level user API
 
-...
+```ts
+const package = await parseRpmMetadata(blob.stream());
+
+package.name; // string
+package.buildTime; // Date
+```
+
+with direct access
+
+```ts
+package.raw.signature.get(1004); // ArrayBuffer
+```
+
+and configuration of optimization.
+
+```ts
+parseRpmMetadata(stream, {
+  select: {
+    tags: ["name", "arch", "summery", "size"],
+  },
+});
+```
 
 ## To-Do
 
@@ -28,6 +48,6 @@ Implementation
 - [x] lead
 - [x] header (signature and header)
 - [x] stream parser
-  - [/] read payload
+  - [x] read payload (partial, it's work but unknown how)
 - [ ] sync parser
 - [ ] user API
