@@ -1,6 +1,1 @@
-{
-  "tasks": {},
-  "imports": {
-    "assert": "https://deno.land/std/assert/mod.ts"
-  }
-}
+{}
