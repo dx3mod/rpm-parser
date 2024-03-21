@@ -7,7 +7,7 @@ RPM v3 package metadata parser in TypeScript for use in any environment.
 For [Deno](https://deno.land).
 
 ```ts
-import * from "..";
+import { parseRpmMetadata } from "https://deno.land/x/rpm_parser/mod.ts";
 ```
 
 High-level user API
