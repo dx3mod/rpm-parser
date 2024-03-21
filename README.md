@@ -51,3 +51,8 @@ Implementation
   - [x] read payload (partial, it's work but unknown how)
 - [ ] sync parser
 - [ ] user API
+
+## References
+
+- [Package File Format](https://refspecs.linuxbase.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html)
+- [rpm-rs/rpm](https://github.com/rpm-rs/rpm/)
