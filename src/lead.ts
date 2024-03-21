@@ -1,5 +1,5 @@
 import { ByteBuf } from "./bytebuf.ts";
-import { InvalidLead } from "./errors.ts";
+import { InvalidLeadError } from "./errors.ts";
 import { assertBytes } from "./utils.ts";
 
 export type Lead = {
@@ -26,7 +26,7 @@ export function parseLead(bytebuf: ByteBuf, options?: ParseLeadOptions): Lead {
 
   const type = bytebuf.readUint16();
   if (type !== 0 && type !== 1) {
-    throw new InvalidLead(
+    throw new InvalidLeadError(
       `Invalid 'type' field value. Expect 0 or 1, but read ${type}!`,
     );
   }
