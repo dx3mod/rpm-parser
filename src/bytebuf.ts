@@ -122,4 +122,8 @@ export class ByteBuf {
     }
     return true;
   }
+
+  get unreadBytes(): number {
+    return this.buffer.byteLength - this.byteOffset;
+  }
 }

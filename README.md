@@ -27,6 +27,7 @@ Implementation
 
 - [x] lead
 - [x] header (signature and header)
-- [ ] stream parser
-  - [ ] read payload
+- [x] stream parser
+  - [/] read payload
+- [ ] sync parser
 - [ ] user API
