@@ -3,14 +3,12 @@ import { Lead, parseLead, ParseLeadOptions } from "./lead.ts";
 import { ByteBuf } from "./bytebuf.ts";
 import { RawPackage, RawPackageHeader } from "./raw_package.ts";
 
-interface RpmPackageParserOptions {
-  leadOptions?: ParseLeadOptions;
-  headerOptions?: header.ParseEntriesOptions;
-  capturePayload?: true;
-}
-
-export function RpmPackageParser(
-  options?: RpmPackageParserOptions,
+export function StreamParser(
+  options?: {
+    leadOptions?: ParseLeadOptions;
+    headerOptions?: header.ParseEntriesOptions;
+    capturePayload?: true;
+  },
 ): TransformStream<Uint8Array, RawPackage> {
   const bytebuf = new ByteBuf({ offset: 0, buffer: new ArrayBuffer(0) });
 

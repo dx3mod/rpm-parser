@@ -7,3 +7,5 @@ export class BadMagicCode extends Error {
 }
 
 export class InvalidLead extends RpmParsingError {}
+
+export { AccessToUnparsedEntryError } from "./package_view.ts";

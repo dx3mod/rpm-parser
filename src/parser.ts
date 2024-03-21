@@ -1,5 +1,5 @@
 import { RpmPackageView } from "./package_view.ts";
-import { RpmPackageParser } from "./stream_parser.ts";
+import { StreamParser } from "./stream_parser.ts";
 import { PackageInfoTag } from "./tag.ts";
 
 interface ParseRpmPackageOptions {
@@ -15,7 +15,7 @@ export async function parseRpmPackage(
   stream: ReadableStream<Uint8Array>,
   options?: ParseRpmPackageOptions,
 ): Promise<RpmPackageView> {
-  const reader = stream.pipeThrough(RpmPackageParser({
+  const reader = stream.pipeThrough(StreamParser({
     capturePayload: options?.select?.payload,
     leadOptions: {
       withoutName: options?.select?.leadName ? undefined : true,
