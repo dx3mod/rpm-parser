@@ -1,10 +1,10 @@
 import { RpmPackageView } from "./package_view.ts";
 import { StreamParser } from "./stream_parser.ts";
-import { PackageInfoTag } from "./tag.ts";
+import { InfoTag } from "./tag.ts";
 
 interface ParseRpmPackageOptions {
   select?: {
-    tags?: (PackageInfoTag | number)[];
+    tags?: (InfoTag | number)[];
     /** Reading payload by chunk may be slow at the moment.  */
     payload?: true;
     leadName?: true;

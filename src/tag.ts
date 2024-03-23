@@ -1,6 +1,6 @@
 // https://refspecs.linuxbase.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html#AEN39174
 
-export enum PackageInfoTag {
+export enum InfoTag {
   /** This tag specifies the name of the package. */
   Name = 1000,
 
@@ -78,7 +78,7 @@ export enum PackageInfoTag {
   PayloadFlags = 1126,
 }
 
-export enum PackageDependencyTag {
+export enum DependencyTag {
   ProvideName = 1047,
   ProvideFlags = 1112,
   ProvideVersion = 1113,

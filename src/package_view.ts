@@ -1,6 +1,6 @@
 import { RawPackage } from "./raw_package.ts";
-import { PackageDependencyTag } from "./tag.ts";
-import { PackageInfoTag } from "./tag.ts";
+import { DependencyTag } from "./tag.ts";
+import { InfoTag } from "./tag.ts";
 
 export class AccessToUnparsedEntryError extends Error {
   constructor(public readonly tag: number) {
@@ -16,52 +16,52 @@ export class RpmPackageView {
   ) {}
 
   get name(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Name);
+    return this.getHeaderEntryData(InfoTag.Name);
   }
 
   get version(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Version);
+    return this.getHeaderEntryData(InfoTag.Version);
   }
 
   get release(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Release);
+    return this.getHeaderEntryData(InfoTag.Release);
   }
 
   get summery(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Summery)[0];
+    return this.getHeaderEntryData(InfoTag.Summery)[0];
   }
 
   get description(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Description)[0];
+    return this.getHeaderEntryData(InfoTag.Description)[0];
   }
 
   get vendor(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Vendor);
+    return this.getHeaderEntryData(InfoTag.Vendor);
   }
 
   get license(): string {
-    return this.getHeaderEntryData(PackageInfoTag.License);
+    return this.getHeaderEntryData(InfoTag.License);
   }
 
   get packager(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Packager);
+    return this.getHeaderEntryData(InfoTag.Packager);
   }
 
   get os(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Os);
+    return this.getHeaderEntryData(InfoTag.Os);
   }
 
   get arch(): string {
-    return this.getHeaderEntryData(PackageInfoTag.Arch);
+    return this.getHeaderEntryData(InfoTag.Arch);
   }
 
   get dependencies(): { name: string; version: string }[] {
     const requireName = this.getHeaderEntryData<string[]>(
-      PackageDependencyTag.RequireName,
+      DependencyTag.RequireName,
     );
 
     const requireVersion = this.getHeaderEntryData<string[]>(
-      PackageDependencyTag.RequireVersion,
+      DependencyTag.RequireVersion,
     );
 
     const array = [];
@@ -73,7 +73,7 @@ export class RpmPackageView {
     return array;
   }
 
-  get<T = unknown>(tag: PackageInfoTag | number): T | undefined {
+  get<T = unknown>(tag: InfoTag | number): T | undefined {
     return this.raw.header.entries.get(tag)?.data as (T | undefined);
   }
 
