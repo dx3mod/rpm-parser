@@ -97,13 +97,46 @@ export class RpmPackageView {
       : undefined;
   }
 
+  get digest(): { sha1: string; md5: ArrayBuffer } {
+    return {
+      sha1: this.getSignatureEntryData(269),
+      md5: this.getSignatureEntryData(1004),
+    };
+  }
+
+  get signing(): {
+    dsa?: ArrayBuffer;
+    rsa?: ArrayBuffer;
+    pgp?: ArrayBuffer;
+    gpg?: ArrayBuffer;
+  } {
+    return {
+      dsa: this.getSignature(267),
+      rsa: this.getSignature(268),
+      pgp: this.getSignature(1002),
+      gpg: this.getSignature(1005),
+    };
+  }
+
   get<T = unknown>(tag: InfoTag | number): T | undefined {
     return this.raw.header.entries.get(tag)?.data as (T | undefined);
+  }
+
+  private getSignature<T = unknown>(tag: InfoTag | number): T | undefined {
+    return this.raw.signature.entries.get(tag)?.data as (T | undefined);
   }
 
   private getHeaderEntryData<T = any>(tag: number): T {
     try {
       return this.raw.header.entries.get(tag)!.data as T;
+    } catch {
+      throw new AccessToUnparsedEntryError(tag);
+    }
+  }
+
+  private getSignatureEntryData<T = any>(tag: number): T {
+    try {
+      return this.raw.signature.entries.get(tag)!.data as T;
     } catch {
       throw new AccessToUnparsedEntryError(tag);
     }
