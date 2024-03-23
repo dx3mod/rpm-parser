@@ -35,11 +35,11 @@ parseRpmMetadata(
     // partial parsing of necessary header entries
     select: {
       tags: [
-        PackageInfoTag.Name,
-        PackageInfoTag.Os,
-        PackageInfoTag.Arch,
-        PackageInfoTag.Summery,
-        PackageInfoTag.Size,
+        InfoTag.Name,
+        InfoTag.Os,
+        InfoTag.Arch,
+        InfoTag.Summery,
+        InfoTag.Size,
       ],
     },
   },
