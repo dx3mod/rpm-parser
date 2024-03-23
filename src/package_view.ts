@@ -1,4 +1,5 @@
 import { RawPackage } from "./raw_package.ts";
+import { PackageDependencyTag } from "./tag.ts";
 import { PackageInfoTag } from "./tag.ts";
 
 export class AccessToUnparsedEntryError extends Error {
@@ -54,13 +55,31 @@ export class RpmPackageView {
     return this.getHeaderEntryData(PackageInfoTag.Arch);
   }
 
-  get(tag: PackageInfoTag): unknown {
-    return this.getHeaderEntryData(tag);
+  get dependencies(): { name: string; version: string }[] {
+    const requireName = this.getHeaderEntryData<string[]>(
+      PackageDependencyTag.RequireName,
+    );
+
+    const requireVersion = this.getHeaderEntryData<string[]>(
+      PackageDependencyTag.RequireVersion,
+    );
+
+    const array = [];
+
+    for (let i = 0; i < requireName.length; i++) {
+      array.push({ name: requireName[i], version: requireVersion[i] });
+    }
+
+    return array;
   }
 
-  private getHeaderEntryData(tag: number): any {
+  get<T = unknown>(tag: PackageInfoTag | number): T | undefined {
+    return this.raw.header.entries.get(tag)?.data as (T | undefined);
+  }
+
+  private getHeaderEntryData<T = any>(tag: number): T {
     try {
-      return this.raw.header.entries.get(tag)!.data;
+      return this.raw.header.entries.get(tag)!.data as T;
     } catch {
       throw new AccessToUnparsedEntryError(tag);
     }
