@@ -1,6 +1,5 @@
 import { RawPackage } from "./raw_package.ts";
-import { DependencyTag } from "./tag.ts";
-import { InfoTag } from "./tag.ts";
+import { DependencyTag, InfoTag, OtherTag } from "./tag.ts";
 
 export class AccessToUnparsedEntryError extends Error {
   constructor(public readonly tag: number) {
@@ -71,6 +70,14 @@ export class RpmPackageView {
     }
 
     return array;
+  }
+
+  get buildTime(): Date {
+    return new Date(this.getHeaderEntryData(OtherTag.BuildTime) * 1000);
+  }
+
+  get platform(): string {
+    return this.getHeaderEntryData(OtherTag.Platform);
   }
 
   get<T = unknown>(tag: InfoTag | number): T | undefined {

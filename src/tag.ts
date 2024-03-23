@@ -93,3 +93,19 @@ export enum DependencyTag {
   ObsoleteFlags = 1114,
   ObsoleteVersion = 1114,
 }
+
+export enum OtherTag {
+  BuildTime = 1006,
+  BuildHost = 1007,
+
+  FileVerifyFlags = 1045,
+
+  ChangeLogTime = 1080,
+  ChangeLogName = 1081,
+  ChangeLogText = 1082,
+
+  OptFlags = 1122,
+
+  RhnPlatform = 1131,
+  Platform = 1132,
+}
