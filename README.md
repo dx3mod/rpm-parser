@@ -43,6 +43,10 @@ parseRpmMetadata(stream, {
 });
 ```
 
+## Documentation
+
+- [API reference](https://deno.land/x/rpm_parser/mod.ts)
+
 ## To-Do
 
 Implementation

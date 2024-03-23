@@ -9,6 +9,7 @@ export class AccessToUnparsedEntryError extends Error {
   }
 }
 
+/** Generic view for any RPM package. */
 export class RpmPackageView {
   constructor(
     public readonly raw: RawPackage,
@@ -78,6 +79,22 @@ export class RpmPackageView {
 
   get platform(): string {
     return this.getHeaderEntryData(OtherTag.Platform);
+  }
+
+  get payload(): {
+    data: Uint8Array;
+    compressor: string;
+    flags: string;
+    format: string;
+  } | undefined {
+    return this.raw.payload
+      ? {
+        data: new Uint8Array(this.raw.payload),
+        flags: this.getHeaderEntryData(InfoTag.PayloadFlags),
+        compressor: this.getHeaderEntryData(InfoTag.PayloadCompressor),
+        format: this.getHeaderEntryData(InfoTag.PayloadFormat),
+      }
+      : undefined;
   }
 
   get<T = unknown>(tag: InfoTag | number): T | undefined {
