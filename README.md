@@ -13,7 +13,7 @@ import { parseRpmMetadata } from "https://deno.land/x/rpm_parser/mod.ts";
 High-level user API
 
 ```ts
-// read from stream in chunks
+// parse from stream in chunks
 const pkg = await parseRpmMetadata(blob.stream());
 
 pkg.name; // string
@@ -29,34 +29,26 @@ pkg.raw.signature.entries.get(1004); // Entry
 and configuration of optimization.
 
 ```ts
-parseRpmMetadata(stream, {
-  // partial parsing of necessary header entries
-  select: {
-    tags: [
-      PackageInfoTag.Name,
-      PackageInfoTag.Os,
-      PackageInfoTag.Arch,
-      PackageInfoTag.Summery,
-      PackageInfoTag.Size,
-    ],
+parseRpmMetadata(
+  stream,
+  {
+    // partial parsing of necessary header entries
+    select: {
+      tags: [
+        PackageInfoTag.Name,
+        PackageInfoTag.Os,
+        PackageInfoTag.Arch,
+        PackageInfoTag.Summery,
+        PackageInfoTag.Size,
+      ],
+    },
   },
-});
+);
 ```
 
 ## Documentation
 
 - [API reference](https://deno.land/x/rpm_parser/mod.ts)
-
-## To-Do
-
-Implementation
-
-- [x] lead
-- [x] header (signature and header)
-- [x] stream parser
-  - [x] read payload (it's work but unknown how)
-- [ ] sync parser
-- [x] user API
 
 ## References
 
