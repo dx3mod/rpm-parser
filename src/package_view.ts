@@ -87,6 +87,13 @@ export class RpmPackageView {
   }
 
   /**
+   * @throws {AccessToUnparsedEntryError} There must be a tag `InfoTag.Size`
+   */
+  get size(): number {
+    return this.getHeaderEntryData(InfoTag.Size);
+  }
+
+  /**
    * @throws {AccessToUnparsedEntryError} There must be tags:
    * `DependencyTag.RequireName` and `DependencyTag.RequireVersion`.
    */

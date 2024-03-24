@@ -15,7 +15,7 @@ if (import.meta.main) {
       release: pkg.release,
       architecture: pkg.arch,
       group: pkg.get<string[]>(InfoTag.Group),
-      size: pkg.get(InfoTag.Size),
+      size: pkg.size,
       license: pkg.license,
       //   signature
       sourceRpm: pkg.get(InfoTag.SourceRpm),
