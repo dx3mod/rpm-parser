@@ -6,6 +6,7 @@ export type RawPackageHeader = {
   entries: Map<number, header.Entry>;
 };
 
+/** "As is" representation of a parsed RPM package. */
 export type RawPackage = {
   lead: Lead;
   signature: RawPackageHeader;

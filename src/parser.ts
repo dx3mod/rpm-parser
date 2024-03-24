@@ -4,11 +4,14 @@ import { InfoTag } from "./tag.ts";
 import { StreamParser } from "./stream_parser.ts";
 import { parseBuffer } from "./sync_parser.ts";
 
-interface ParseRpmPackageOptions {
+/** RPM package parsing options. */
+export interface ParseRpmPackageOptions {
+  /** Select header tags to be parsed. */
   select?: {
     tags?: (InfoTag | number)[];
   };
 
+  /** Capture values not parsed by default. */
   capture?: {
     /** **Don't use it!** */
     payload?: true;
@@ -16,6 +19,9 @@ interface ParseRpmPackageOptions {
   };
 }
 
+/** Parse fixed buffer as RPM package.
+ * @throws {RpmParsingError} and derivatives.
+ */
 export function parseRpmPackageSync(
   uint8Array: Uint8Array,
   options?: ParseRpmPackageOptions,
@@ -28,6 +34,9 @@ export function parseRpmPackageSync(
   );
 }
 
+/** Parse readable stream as RPM package.
+ * @throws {RpmParsingError} and derivatives.
+ */
 export async function parseRpmPackage(
   stream: ReadableStream<Uint8Array>,
   options?: ParseRpmPackageOptions,

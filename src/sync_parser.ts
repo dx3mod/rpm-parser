@@ -3,6 +3,9 @@ import { parseEntries, ParseEntriesOptions, parseIndex } from "./header.ts";
 
 import { ByteBuf } from "./bytebuf.ts";
 
+/** Parse fixed buffer as `RawPackage`.
+ * Primarily for internal use!
+ */
 export function parseBuffer(buffer: ArrayBuffer, options?: {
   leadOptions?: ParseLeadOptions;
   headerOptions?: ParseEntriesOptions;

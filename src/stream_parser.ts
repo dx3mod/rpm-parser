@@ -3,6 +3,9 @@ import { Lead, parseLead, ParseLeadOptions } from "./lead.ts";
 import { ByteBuf } from "./bytebuf.ts";
 import { RawPackage, RawPackageHeader } from "./raw_package.ts";
 
+/** Create a `TransformStream` object to parse input bytes into `RawPackage`.
+ * Primarily for internal use!
+ */
 export function StreamParser(
   options?: {
     leadOptions?: ParseLeadOptions;
