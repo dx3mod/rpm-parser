@@ -46,6 +46,34 @@ parseRpmMetadata(
 );
 ```
 
+## For fun
+
+```console
+$ deno run --allow-read \
+    https://raw.githubusercontent.com/dx3mod/rpm-parser/master/cli.ts \
+    hello-2.10-alt1.1.src.rpm
+```
+
+```js
+{
+  name: "hello",
+  version: "2.10",
+  release: "alt1.1",
+  architecture: "i586",
+  group: [ "Development/C" ],
+  size: 700833,
+  license: "GPLv3+",
+  sourceRpm: undefined,
+  buildDate: 2015-12-04T03:01:12.000Z,
+  buildHost: "viy-sisyphus.hasher.altlinux.org",
+  vendor: "ALT Linux Team",
+  url: "ftp://ftp.gnu.org/gnu/hello/",
+  summery: "GNU hello, THE greeting printing program",
+  description: "The GNU `hello' program produces a familiar, friendly greeting.  It\n" +
+    "allows nonprogrammers to use a c"... 173 more characters
+}
+```
+
 ## Documentation
 
 - [API reference](https://deno.land/x/rpm_parser/mod.ts)
