@@ -64,8 +64,7 @@ export function parseEntries(
     entries.set(entry.tag, entry);
   }
 
-  const padding = (8 - (index.sectionSize % 8)) % 8;
-  bytebuf.byteOffset = restSize + index.sectionSize + padding;
+  bytebuf.byteOffset = restSize + index.sectionSize;
 
   return entries;
 }
@@ -113,4 +112,8 @@ function parseEntryData(bytebuf: ByteBuf, entry: Entry) {
   }
 
   throw new RpmParsingError(`Unknown tagType ${entry.tagType}!`);
+}
+
+export function calculatePadding(sectionSize: number): number {
+  return (8 - (sectionSize % 8)) % 8;
 }

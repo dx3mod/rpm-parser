@@ -1,4 +1,9 @@
-import { parseLead, ParseLeadOptions, RawPackage } from "./raw.mod.ts";
+import {
+  calculatePadding,
+  parseLead,
+  ParseLeadOptions,
+  RawPackage,
+} from "./raw.mod.ts";
 import { parseEntries, ParseEntriesOptions, parseIndex } from "./header.ts";
 
 import { ByteBuf } from "./bytebuf.ts";
@@ -17,6 +22,7 @@ export function parseBuffer(buffer: ArrayBuffer, options?: {
 
   const signatureIndex = parseIndex(bytebuf);
   const signatureEntries = parseEntries(bytebuf, signatureIndex);
+  bytebuf.skip(calculatePadding(signatureIndex.sectionSize));
 
   const headerIndex = parseIndex(bytebuf);
   const headerEntries = parseEntries(

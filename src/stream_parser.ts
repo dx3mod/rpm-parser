@@ -2,6 +2,7 @@ import * as header from "./header.ts";
 import { Lead, parseLead, ParseLeadOptions } from "./lead.ts";
 import { ByteBuf } from "./bytebuf.ts";
 import { RawPackage, RawPackageHeader } from "./raw_package.ts";
+import { calculatePadding } from "./header.ts";
 
 /** Create a `TransformStream` object to parse input bytes into `RawPackage`.
  * Primarily for internal use!
@@ -46,13 +47,16 @@ export function StreamParser(
               signatureIndex = header.parseIndex(bytebuf);
             }
 
+            const padding = calculatePadding(signatureIndex.sectionSize);
+
             if (
               bytebuf.unreadBytes <
                 (signatureIndex.numberOfEntries * 16 +
-                  signatureIndex.sectionSize)
+                  signatureIndex.sectionSize + padding)
             ) return;
 
             const entries = header.parseEntries(bytebuf, signatureIndex);
+            bytebuf.skip(padding);
 
             signatureHeader = { index: signatureIndex, entries };
             state = ParsingState.Header;
