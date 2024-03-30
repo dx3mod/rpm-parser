@@ -2,19 +2,17 @@
 
 RPM v3 package metadata parser in TypeScript for use in any environment.
 
-## Get Started
-
-For [Deno](https://deno.land).
+## Overview
 
 ```ts
-import { parseRpmMetadata } from "https://deno.land/x/rpm_parser/mod.ts";
+import { parseRpmPackage } from "@dx3mod/rpm-parser";
 ```
 
 High-level user API
 
 ```ts
 // parse from stream in chunks
-const pkg = await parseRpmMetadata(blob.stream());
+const pkg = await parseRpmPackage(blob.stream());
 
 pkg.name; // string
 pkg.buildTime; // Date
@@ -26,10 +24,10 @@ with direct access
 pkg.raw.signature.entries.get(1004); // Entry
 ```
 
-and configuration of optimization.
+and partial parsing.
 
 ```ts
-parseRpmMetadata(
+parseRpmPackage(
   stream,
   {
     // partial parsing of necessary header entries
@@ -41,6 +39,9 @@ parseRpmMetadata(
         InfoTag.Summery,
         InfoTag.Size,
       ],
+    },
+    capture: {
+      payload: true,
     },
   },
 );
@@ -76,7 +77,7 @@ $ deno run --allow-read \
 
 ## Documentation
 
-- [API reference](https://deno.land/x/rpm_parser/mod.ts)
+- [API reference](https://jsr.io/@dx3mod/rpm-parser/doc)
 
 ## References
 
