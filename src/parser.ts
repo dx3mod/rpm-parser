@@ -1,5 +1,5 @@
 import { RpmPackageView } from "./package_view.ts";
-import { InfoTag } from "./tag.ts";
+import { DependencyTag, InfoTag, OtherTag } from "./tag.ts";
 
 import { StreamParser } from "./stream_parser.ts";
 import { parseBuffer } from "./sync_parser.ts";
@@ -8,7 +8,7 @@ import { parseBuffer } from "./sync_parser.ts";
 export interface ParseRpmPackageOptions {
   /** Select header tags to be parsed. */
   select?: {
-    tags?: (InfoTag | number)[];
+    tags?: (InfoTag | DependencyTag | OtherTag | number)[];
   };
 
   /** Capture values not parsed by default. */
