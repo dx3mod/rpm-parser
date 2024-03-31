@@ -110,7 +110,7 @@ function parseEntryData(bytebuf: ByteBuf, entry: Entry) {
       return bytebuf.readBuffer(entry.count);
     case EntryDataType.STRING:
       return bytebuf.readNullTerminatedString();
-    case EntryDataType.I18N_STRING:
+    case EntryDataType.I18N_STRING: // TODO: I18N_STRING not implement now
     case EntryDataType.STRING_ARRAY:
       return bytebuf.readArray(
         () => bytebuf.readNullTerminatedString(),
