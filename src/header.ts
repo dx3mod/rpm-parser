@@ -1,6 +1,6 @@
-import { ByteBuf } from "./bytebuf.ts";
+import { BadMagicCodeError } from "../mod.ts";
+import ByteBuf from "./bytebuf.ts";
 import { RpmParsingError } from "./errors.ts";
-import { assertBytes } from "./utils.ts";
 
 /** Header Index */
 export type Index = {
@@ -8,8 +8,15 @@ export type Index = {
   sectionSize: number;
 };
 
+const HEADER_INDEX_MAGIC_CODE = [0x8e, 0xad, 0xe8, 0x01];
+
 export function parseIndex(bytebuf: ByteBuf): Index {
-  assertBytes(bytebuf, 0x8e, 0xad, 0xe8, 0x01);
+  if (!bytebuf.matchBytes(HEADER_INDEX_MAGIC_CODE)) {
+    throw new BadMagicCodeError(
+      "Invalid Header Index magic code!",
+      HEADER_INDEX_MAGIC_CODE,
+    );
+  }
 
   bytebuf.skip(4); // reserved
 

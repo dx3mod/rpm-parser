@@ -1,6 +1,6 @@
-import { ByteBuf } from "./bytebuf.ts";
-import { InvalidLeadError } from "./errors.ts";
-import { assertBytes } from "./utils.ts";
+import { RpmParsingError } from "../mod.ts";
+import { BadMagicCodeError } from "../mod.ts";
+import ByteBuf from "./bytebuf.ts";
 
 export type Lead = {
   version: { major: number; minor: number };
@@ -18,15 +18,19 @@ export interface ParseLeadOptions {
   withoutName?: true;
 }
 
+const LEAD_MAGIC_CODE = [0xed, 0xab, 0xee, 0xdb];
+
 export function parseLead(bytebuf: ByteBuf, options?: ParseLeadOptions): Lead {
-  assertBytes(bytebuf, 0xed, 0xab, 0xee, 0xdb);
+  if (!bytebuf.matchBytes(LEAD_MAGIC_CODE)) {
+    throw new BadMagicCodeError("Invalid Lead magic code!", LEAD_MAGIC_CODE);
+  }
 
   const major = bytebuf.readUint8();
   const minor = bytebuf.readUint8();
 
   const type = bytebuf.readUint16();
   if (type !== 0 && type !== 1) {
-    throw new InvalidLeadError(
+    throw new RpmParsingError(
       `Invalid 'type' field value. Expect 0 or 1, but read ${type}!`,
     );
   }

@@ -1,12 +1,13 @@
 import {
   calculatePadding,
-  parseLead,
-  ParseLeadOptions,
-  RawPackage,
-} from "./raw.mod.ts";
-import { parseEntries, ParseEntriesOptions, parseIndex } from "./header.ts";
+  parseEntries,
+  ParseEntriesOptions,
+  parseIndex,
+} from "./header.ts";
 
-import { ByteBuf } from "./bytebuf.ts";
+import ByteBuf from "./bytebuf.ts";
+import { parseLead, ParseLeadOptions } from "./lead.ts";
+import { RawPackage } from "./raw_package.ts";
 
 /** Parse fixed buffer as `RawPackage`.
  * Primarily for internal use!

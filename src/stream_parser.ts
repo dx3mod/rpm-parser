@@ -1,6 +1,6 @@
 import * as header from "./header.ts";
 import { Lead, parseLead, ParseLeadOptions } from "./lead.ts";
-import { ByteBuf } from "./bytebuf.ts";
+import ByteBuf from "./bytebuf.ts";
 import { RawPackage, RawPackageHeader } from "./raw_package.ts";
 import { calculatePadding } from "./header.ts";
 

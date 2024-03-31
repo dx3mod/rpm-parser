@@ -1,10 +1,12 @@
+import { BadMagicCodeError } from "./errors.ts";
+
 interface ByteBufOptions {
   offset?: number;
   buffer: ArrayBuffer;
 }
 
 /** A wrapper view for the DataView to read bytes. */
-export class ByteBuf {
+export default class ByteBuf {
   private dataView: DataView;
   private textDecoder: TextDecoder;
 
@@ -116,7 +118,7 @@ export class ByteBuf {
     );
   }
 
-  assertBytes(bytes: number[]): boolean {
+  matchBytes(bytes: number[]): boolean {
     for (const byte of bytes) {
       if (byte !== this.readUint8()) return false;
     }
