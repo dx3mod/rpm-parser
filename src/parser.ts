@@ -13,9 +13,8 @@ export interface ParseRpmPackageOptions {
 
   /** Capture values not parsed by default. */
   capture?: {
-    /** **Don't use it!** */
     payload?: true;
-    leadName?: true;
+    filename?: true | "raw";
   };
 }
 
@@ -49,14 +48,14 @@ export async function parseRpmPackage(
   return new RpmPackageView(rawPackage.value!);
 }
 
-function expandOptions(options?: ParseRpmPackageOptions): any {
+function expandOptions(options?: ParseRpmPackageOptions): object {
   const setTags = new Set(options?.select?.tags);
 
   return {
     capturePayload: options?.capture?.payload,
     leadOptions: {
-      withoutName: options?.capture?.payload ? undefined : true,
-      rawName: true,
+      withoutName: options?.capture?.filename ? undefined : true,
+      rawName: options?.capture?.filename === "raw" ? true : undefined,
     },
     headerOptions: {
       selectByTag: options?.select?.tags
