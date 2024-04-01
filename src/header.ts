@@ -54,9 +54,9 @@ export function parseEntries(
       continue;
     }
 
-    const tagType = bytebuf.readInt32();
-    const offset = bytebuf.readInt32();
-    const count = bytebuf.readInt32();
+    const tagType = bytebuf.readUint32();
+    const offset = bytebuf.readUint32();
+    const count = bytebuf.readUint32();
 
     const data = parseEntryData(
       bytebuf.duplicate(restSize + offset),
