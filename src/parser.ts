@@ -50,6 +50,8 @@ export async function parseRpmPackage(
 }
 
 function expandOptions(options?: ParseRpmPackageOptions): any {
+  const setTags = new Set(options?.select?.tags);
+
   return {
     capturePayload: options?.capture?.payload,
     leadOptions: {
@@ -57,9 +59,9 @@ function expandOptions(options?: ParseRpmPackageOptions): any {
       rawName: true,
     },
     headerOptions: {
-      // TODO: optimize select predicate
       selectByTag: options?.select?.tags
-        ? ((tag: number) => options.select!.tags!.includes(tag))
+        // Is `Set.has` fast enough?
+        ? ((tag: number) => setTags.has(tag))
         : undefined,
     },
   };
