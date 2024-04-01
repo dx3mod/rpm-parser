@@ -31,17 +31,8 @@ export type Entry = {
   tagType: number;
   offset: number;
   count: number;
-  data?: unknown;
+  data: unknown;
 };
-
-export function parseEntry(bytebuf: ByteBuf): Entry {
-  const tag = bytebuf.readInt32();
-  const tagType = bytebuf.readInt32();
-  const offset = bytebuf.readInt32();
-  const count = bytebuf.readInt32();
-
-  return { tag, tagType, offset, count };
-}
 
 export interface ParseEntriesOptions {
   selectByTag?: (tag: number) => boolean;
@@ -57,18 +48,23 @@ export function parseEntries(
   const restSize = bytebuf.byteOffset + index.numberOfEntries * 16;
 
   for (let i = 0; i < index.numberOfEntries; i++) {
-    const entry = parseEntry(bytebuf);
+    const tag = bytebuf.readUint32();
 
-    if (options?.selectByTag && !options.selectByTag(entry.tag)) {
+    if (options?.selectByTag && !options.selectByTag(tag)) {
       continue;
     }
 
-    entry.data = parseEntryData(
-      bytebuf.duplicate(restSize + entry.offset),
-      entry,
+    const tagType = bytebuf.readInt32();
+    const offset = bytebuf.readInt32();
+    const count = bytebuf.readInt32();
+
+    const data = parseEntryData(
+      bytebuf.duplicate(restSize + offset),
+      count,
+      tagType,
     );
 
-    entries.set(entry.tag, entry);
+    entries.set(tag, { tag, tagType, offset, count, data });
   }
 
   bytebuf.byteOffset = restSize + index.sectionSize;
@@ -89,11 +85,11 @@ export enum EntryDataType {
   I18N_STRING = 9,
 }
 
-function parseEntryData(bytebuf: ByteBuf, entry: Entry) {
+function parseEntryData(bytebuf: ByteBuf, count: number, tagType: number) {
   const readOneOrArray = <T>(reader: () => T) =>
-    entry.count === 1 ? reader() : bytebuf.readArray(reader, entry.count);
+    count === 1 ? reader() : bytebuf.readArray(reader, count);
 
-  switch (entry.tagType) {
+  switch (tagType) {
     case EntryDataType.NULL:
       return null;
     case EntryDataType.CHAR:
@@ -107,18 +103,18 @@ function parseEntryData(bytebuf: ByteBuf, entry: Entry) {
     case EntryDataType.INT64:
       throw new RpmParsingError("Not supported EntryDataType.INT64!");
     case EntryDataType.BINARY:
-      return bytebuf.readBuffer(entry.count);
+      return bytebuf.readBuffer(count);
     case EntryDataType.STRING:
       return bytebuf.readNullTerminatedString();
     case EntryDataType.I18N_STRING: // TODO: I18N_STRING not implement now
     case EntryDataType.STRING_ARRAY:
       return bytebuf.readArray(
         () => bytebuf.readNullTerminatedString(),
-        entry.count,
+        count,
       );
   }
 
-  throw new RpmParsingError(`Unknown tagType ${entry.tagType}!`);
+  throw new RpmParsingError(`Unknown tagType ${tagType}!`);
 }
 
 export function calculatePadding(sectionSize: number): number {
