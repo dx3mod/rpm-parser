@@ -114,8 +114,6 @@ export function StreamParser(
         header: mainHeader,
         payload,
       });
-
-      controller.terminate();
     },
   });
 }
