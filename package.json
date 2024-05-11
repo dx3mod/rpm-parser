@@ -1,6 +1,6 @@
 {
   "name": "@dx3mod/rpm-parser",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "RPM v3 package metadata parser",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,8 +25,5 @@
     "@types/node": "^20.12.11",
     "prettier": "3.2.5",
     "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "undici-types": "^5.26.5"
   }
 }
