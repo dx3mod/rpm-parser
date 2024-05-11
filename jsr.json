@@ -1,5 +1,0 @@
-{
-  "name": "@dx3mod/rpm-parser",
-  "version": "0.1.13",
-  "exports": "./mod.ts"
-}

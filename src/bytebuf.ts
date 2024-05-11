@@ -1,5 +1,3 @@
-import { BadMagicCodeError } from "./errors.ts";
-
 interface ByteBufOptions {
   offset?: number;
   buffer: ArrayBuffer;

@@ -1,5 +1,5 @@
-import { RawPackage } from "./raw_package.ts";
-import { DependencyTag, InfoTag, OtherTag } from "./tag.ts";
+import { RawPackage } from "./raw_package";
+import { DependencyTag, InfoTag, OtherTag } from "./tags";
 
 /** Error when accessing an RPM field of a package that does not exist or has not been parsed. */
 export class AccessToUnparsedEntryError extends Error {
@@ -12,9 +12,7 @@ export class AccessToUnparsedEntryError extends Error {
 
 /** Generic view for any RPM package. */
 export class RpmPackageView {
-  constructor(
-    public readonly raw: RawPackage,
-  ) {}
+  constructor(public readonly raw: RawPackage) {}
 
   /**
    * @throws {AccessToUnparsedEntryError} There must be a tag `InfoTag.Name`
@@ -142,19 +140,21 @@ export class RpmPackageView {
    * @throws {AccessToUnparsedEntryError} There must be tag:
    *  `InfoTag.PayloadFlags`, `InfoTag.PayloadCompressor` and `InfoTag.PayloadFormat`.
    */
-  get payload(): {
-    data: Uint8Array;
-    compressor: string;
-    flags: string;
-    format: string;
-  } | undefined {
+  get payload():
+    | {
+        data: Uint8Array;
+        compressor: string;
+        flags: string;
+        format: string;
+      }
+    | undefined {
     return this.raw.payload
       ? {
-        data: new Uint8Array(this.raw.payload),
-        flags: this.getHeaderEntryData(InfoTag.PayloadFlags),
-        compressor: this.getHeaderEntryData(InfoTag.PayloadCompressor),
-        format: this.getHeaderEntryData(InfoTag.PayloadFormat),
-      }
+          data: new Uint8Array(this.raw.payload),
+          flags: this.getHeaderEntryData(InfoTag.PayloadFlags),
+          compressor: this.getHeaderEntryData(InfoTag.PayloadCompressor),
+          format: this.getHeaderEntryData(InfoTag.PayloadFormat),
+        }
       : undefined;
   }
 
@@ -187,12 +187,12 @@ export class RpmPackageView {
 
   /** Get a header's data by tag. */
   get<T = unknown>(tag: InfoTag | number): T | undefined {
-    return this.raw.header.entries.get(tag)?.data as (T | undefined);
+    return this.raw.header.entries.get(tag)?.data as T | undefined;
   }
 
   /** Get a signature's data by tag. */
   private getSignature<T = unknown>(tag: InfoTag | number): T | undefined {
-    return this.raw.signature.entries.get(tag)?.data as (T | undefined);
+    return this.raw.signature.entries.get(tag)?.data as T | undefined;
   }
 
   private getHeaderEntryData<T = any>(tag: number): T {

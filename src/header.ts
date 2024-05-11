@@ -1,6 +1,5 @@
-import { BadMagicCodeError } from "../mod.ts";
-import ByteBuf from "./bytebuf.ts";
-import { RpmParsingError } from "./errors.ts";
+import ByteBuf from "./bytebuf";
+import { BadMagicCodeError, RpmParsingError } from "./errors";
 
 /** Header Index */
 export type Index = {
@@ -108,10 +107,7 @@ function parseEntryData(bytebuf: ByteBuf, count: number, tagType: number) {
       return bytebuf.readNullTerminatedString();
     case EntryDataType.I18N_STRING: // TODO: I18N_STRING not implement now
     case EntryDataType.STRING_ARRAY:
-      return bytebuf.readArray(
-        () => bytebuf.readNullTerminatedString(),
-        count,
-      );
+      return bytebuf.readArray(() => bytebuf.readNullTerminatedString(), count);
   }
 
   throw new RpmParsingError(`Unknown tagType ${tagType}!`);

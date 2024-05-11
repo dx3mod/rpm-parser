@@ -3,20 +3,23 @@ import {
   parseEntries,
   ParseEntriesOptions,
   parseIndex,
-} from "./header.ts";
+} from "./header";
 
-import ByteBuf from "./bytebuf.ts";
-import { parseLead, ParseLeadOptions } from "./lead.ts";
-import { RawPackage } from "./raw_package.ts";
+import ByteBuf from "./bytebuf";
+import { parseLead, ParseLeadOptions } from "./lead";
+import { RawPackage } from "./raw_package";
 
 /** Parse fixed buffer as `RawPackage`.
  * Primarily for internal use!
  */
-export function parseBuffer(buffer: ArrayBuffer, options?: {
-  leadOptions?: ParseLeadOptions;
-  headerOptions?: ParseEntriesOptions;
-  capturePayload?: true;
-}): RawPackage {
+export function parseBuffer(
+  buffer: ArrayBuffer,
+  options?: {
+    leadOptions?: ParseLeadOptions;
+    headerOptions?: ParseEntriesOptions;
+    capturePayload?: true;
+  },
+): RawPackage {
   const bytebuf = new ByteBuf({ buffer, offset: 0 });
 
   const lead = parseLead(bytebuf, options?.leadOptions);
@@ -33,8 +36,8 @@ export function parseBuffer(buffer: ArrayBuffer, options?: {
   );
 
   const payload = options?.capturePayload
-    // FIXME: add assert to bytebuf.unreadBytes == payload size
-    ? bytebuf.buffer.slice(bytebuf.byteOffset)
+    ? // FIXME: add assert to bytebuf.unreadBytes == payload size
+      bytebuf.buffer.slice(bytebuf.byteOffset)
     : undefined;
 
   return {

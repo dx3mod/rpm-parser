@@ -14,4 +14,4 @@ export class BadMagicCodeError extends Error {
   }
 }
 
-export { AccessToUnparsedEntryError } from "./package_view.ts";
+export { AccessToUnparsedEntryError } from "./package_view";

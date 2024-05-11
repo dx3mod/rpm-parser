@@ -1,6 +1,5 @@
-import { RpmParsingError } from "../mod.ts";
-import { BadMagicCodeError } from "../mod.ts";
-import ByteBuf from "./bytebuf.ts";
+import ByteBuf from "./bytebuf";
+import { BadMagicCodeError, RpmParsingError } from "./errors";
 
 export type Lead = {
   version: { major: number; minor: number };

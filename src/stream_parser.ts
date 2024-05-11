@@ -1,19 +1,17 @@
-import * as header from "./header.ts";
-import { Lead, parseLead, ParseLeadOptions } from "./lead.ts";
-import ByteBuf from "./bytebuf.ts";
-import { RawPackage, RawPackageHeader } from "./raw_package.ts";
-import { calculatePadding } from "./header.ts";
+import * as header from "./header";
+import { Lead, parseLead, ParseLeadOptions } from "./lead";
+import ByteBuf from "./bytebuf";
+import { RawPackage, RawPackageHeader } from "./raw_package";
+import { calculatePadding } from "./header";
 
 /** Create a `TransformStream` object to parse input bytes into `RawPackage`.
  * Primarily for internal use!
  */
-export function StreamParser(
-  options?: {
-    leadOptions?: ParseLeadOptions;
-    headerOptions?: header.ParseEntriesOptions;
-    capturePayload?: true;
-  },
-): TransformStream<Uint8Array, RawPackage> {
+export function StreamParser(options?: {
+  leadOptions?: ParseLeadOptions;
+  headerOptions?: header.ParseEntriesOptions;
+  capturePayload?: true;
+}): TransformStream<Buffer, RawPackage> {
   const bytebuf = new ByteBuf({ offset: 0, buffer: new ArrayBuffer(0) });
 
   let lead: Lead;
@@ -29,7 +27,7 @@ export function StreamParser(
 
   return new TransformStream({
     transform(chunk, controller) {
-      bytebuf.extend(chunk);
+      bytebuf.extend(new Uint8Array(chunk));
 
       while (state !== ParsingState.Complete) {
         switch (state) {
@@ -51,9 +49,11 @@ export function StreamParser(
 
             if (
               bytebuf.unreadBytes <
-                (signatureIndex.numberOfEntries * 16 +
-                  signatureIndex.sectionSize + padding)
-            ) return;
+              signatureIndex.numberOfEntries * 16 +
+                signatureIndex.sectionSize +
+                padding
+            )
+              return;
 
             const entries = header.parseEntries(bytebuf, signatureIndex);
             bytebuf.skip(padding);
@@ -71,9 +71,9 @@ export function StreamParser(
 
             if (
               bytebuf.unreadBytes <
-                (headerIndex.numberOfEntries * 16 +
-                  headerIndex.sectionSize)
-            ) return;
+              headerIndex.numberOfEntries * 16 + headerIndex.sectionSize
+            )
+              return;
 
             const entries = header.parseEntries(
               bytebuf,
@@ -91,11 +91,12 @@ export function StreamParser(
           // TODO: optimize payload reading from stream
           case ParsingState.Payload: {
             // payloadSize = (payload + header) - header
-            const payloadSize = signatureHeader.entries.get(1000)
-              ?.data as number -
-              (16 + mainHeader.index.numberOfEntries * 16 +
+            const payloadSize =
+              (signatureHeader.entries.get(1000)?.data as number) -
+              (16 +
+                mainHeader.index.numberOfEntries * 16 +
                 mainHeader.index.sectionSize +
-                (8 - (mainHeader.index.sectionSize % 8)) % 8);
+                ((8 - (mainHeader.index.sectionSize % 8)) % 8));
 
             if (bytebuf.unreadBytes < payloadSize) return;
 

@@ -1,5 +1,5 @@
-import * as header from "./header.ts";
-import { Lead } from "./lead.ts";
+import * as header from "./header";
+import { Lead } from "./lead";
 
 export type RawPackageHeader = {
   index: header.Index;
