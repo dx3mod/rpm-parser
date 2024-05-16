@@ -23,10 +23,10 @@ export interface ParseRpmPackageOptions {
  */
 export function parseRpmPackageSync(
   uint8Array: Uint8Array,
-  options?: ParseRpmPackageOptions
+  options?: ParseRpmPackageOptions,
 ): RpmPackageView {
   return new RpmPackageView(
-    parseBuffer(uint8Array.buffer, expandOptions(options))
+    parseBuffer(uint8Array.buffer, expandOptions(options)),
   );
 }
 
@@ -35,7 +35,7 @@ export function parseRpmPackageSync(
  */
 export async function parseRpmPackage(
   stream: ReadableStream,
-  options?: ParseRpmPackageOptions
+  options?: ParseRpmPackageOptions,
 ): Promise<RpmPackageView> {
   const { leadOptions, capturePayload, headerOptions } = expandOptions(options);
 
@@ -44,8 +44,8 @@ export async function parseRpmPackage(
       new StreamParser(
         leadOptions,
         headerOptions,
-        capturePayload
-      ).toWebTransformer()
+        capturePayload,
+      ).toWebTransformer(),
     )
     .getReader();
 

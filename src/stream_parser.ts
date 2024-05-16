@@ -21,7 +21,7 @@ export class StreamParser {
   constructor(
     private readonly leadParserOptions?: ParseLeadOptions,
     private readonly headersParserOptions?: header.ParseEntriesOptions,
-    private readonly capturePayload?: true
+    private readonly capturePayload?: true,
   ) {
     this.state = ParsingState.Lead;
     this.bytebuf = new ByteBuf({ offset: 0, buffer: new ArrayBuffer(0) });
@@ -58,7 +58,7 @@ export class StreamParser {
 
           const entries = header.parseEntries(
             this.bytebuf,
-            this.signatureIndex
+            this.signatureIndex,
           );
           this.bytebuf.skip(padding);
 
@@ -82,7 +82,7 @@ export class StreamParser {
           const entries = header.parseEntries(
             this.bytebuf,
             this.headerIndex,
-            this.headersParserOptions
+            this.headersParserOptions,
           );
 
           this.mainHeader = { index: this.headerIndex, entries };
@@ -130,7 +130,7 @@ export class StreamParser {
   toWebTransformer(): TransformStream<Buffer, RawPackage> {
     const transform = (
       chunk: Buffer,
-      controller: TransformStreamDefaultController
+      controller: TransformStreamDefaultController,
     ) => {
       if (this.read(chunk)) controller.enqueue(this.getRawPackage());
     };
