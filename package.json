@@ -4,6 +4,16 @@
   "description": "RPM v3 package metadata parser",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./stream_parser": {
+      "import": "./dist/stream_parser.js",
+      "types": "./dist/stream_parser.d.ts"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
