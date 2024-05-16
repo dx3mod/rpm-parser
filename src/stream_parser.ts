@@ -4,119 +4,143 @@ import ByteBuf from "./bytebuf";
 import { RawPackage, RawPackageHeader } from "./raw_package";
 import { calculatePadding } from "./header";
 
-/** Create a `TransformStream` object to parse input bytes into `RawPackage`.
- * Primarily for internal use!
- */
-export function StreamParser(options?: {
-  leadOptions?: ParseLeadOptions;
-  headerOptions?: header.ParseEntriesOptions;
-  capturePayload?: true;
-}): TransformStream<Buffer, RawPackage> {
-  const bytebuf = new ByteBuf({ offset: 0, buffer: new ArrayBuffer(0) });
+export class StreamParser {
+  private state: ParsingState;
+  private bytebuf: ByteBuf;
 
-  let lead: Lead;
-  let payload: ArrayBuffer | undefined = undefined;
+  private lead?: Lead;
 
-  let signatureIndex: header.Index | undefined = undefined;
-  let signatureHeader: RawPackageHeader;
+  private signatureIndex?: header.Index;
+  private signatureHeader?: RawPackageHeader;
 
-  let headerIndex: header.Index | undefined = undefined;
-  let mainHeader: RawPackageHeader;
+  private headerIndex?: header.Index;
+  private mainHeader?: RawPackageHeader;
 
-  let state = ParsingState.Lead;
+  private payload?: ArrayBuffer;
 
-  return new TransformStream({
-    transform(chunk, controller) {
-      bytebuf.extend(new Uint8Array(chunk));
+  constructor(
+    private readonly leadParserOptions?: ParseLeadOptions,
+    private readonly headersParserOptions?: header.ParseEntriesOptions,
+    private readonly capturePayload?: true
+  ) {
+    this.state = ParsingState.Lead;
+    this.bytebuf = new ByteBuf({ offset: 0, buffer: new ArrayBuffer(0) });
+  }
 
-      while (state !== ParsingState.Complete) {
-        switch (state) {
-          case ParsingState.Lead: {
-            if (bytebuf.unreadBytes < 96) return;
+  read(chunk: Buffer): boolean {
+    this.bytebuf.extend(new Uint8Array(chunk));
 
-            lead = parseLead(bytebuf, options?.leadOptions);
-            state = ParsingState.Signature;
+    while (this.state !== ParsingState.Complete) {
+      switch (this.state) {
+        case ParsingState.Lead: {
+          if (this.bytebuf.unreadBytes < 96) return false;
 
-            break;
+          this.lead = parseLead(this.bytebuf, this.leadParserOptions);
+          this.state = ParsingState.Signature;
+
+          break;
+        }
+        case ParsingState.Signature: {
+          if (this.signatureIndex === undefined) {
+            if (this.bytebuf.unreadBytes < 16) return false;
+            this.signatureIndex = header.parseIndex(this.bytebuf);
           }
-          case ParsingState.Signature: {
-            if (signatureIndex === undefined) {
-              if (bytebuf.unreadBytes < 16) return;
-              signatureIndex = header.parseIndex(bytebuf);
-            }
 
-            const padding = calculatePadding(signatureIndex.sectionSize);
+          const padding = calculatePadding(this.signatureIndex.sectionSize);
 
-            if (
-              bytebuf.unreadBytes <
-              signatureIndex.numberOfEntries * 16 +
-                signatureIndex.sectionSize +
-                padding
-            )
-              return;
+          if (
+            this.bytebuf.unreadBytes <
+            this.signatureIndex.numberOfEntries * 16 +
+              this.signatureIndex.sectionSize +
+              padding
+          )
+            return false;
 
-            const entries = header.parseEntries(bytebuf, signatureIndex);
-            bytebuf.skip(padding);
+          const entries = header.parseEntries(
+            this.bytebuf,
+            this.signatureIndex
+          );
+          this.bytebuf.skip(padding);
 
-            signatureHeader = { index: signatureIndex, entries };
-            state = ParsingState.Header;
+          this.signatureHeader = { index: this.signatureIndex, entries };
+          this.state = ParsingState.Header;
 
-            break;
+          break;
+        }
+        case ParsingState.Header: {
+          if (this.headerIndex === undefined) {
+            if (this.bytebuf.unreadBytes < 16) return false;
+            this.headerIndex = header.parseIndex(this.bytebuf);
           }
-          case ParsingState.Header: {
-            if (headerIndex === undefined) {
-              if (bytebuf.unreadBytes < 16) return;
-              headerIndex = header.parseIndex(bytebuf);
-            }
 
-            if (
-              bytebuf.unreadBytes <
-              headerIndex.numberOfEntries * 16 + headerIndex.sectionSize
-            )
-              return;
+          if (
+            this.bytebuf.unreadBytes <
+            this.headerIndex.numberOfEntries * 16 + this.headerIndex.sectionSize
+          )
+            return false;
 
-            const entries = header.parseEntries(
-              bytebuf,
-              headerIndex,
-              options?.headerOptions,
-            );
+          const entries = header.parseEntries(
+            this.bytebuf,
+            this.headerIndex,
+            this.headersParserOptions
+          );
 
-            mainHeader = { index: headerIndex, entries };
-            state = options?.capturePayload
-              ? ParsingState.Payload
-              : ParsingState.Complete;
+          this.mainHeader = { index: this.headerIndex, entries };
+          this.state = this.capturePayload
+            ? ParsingState.Payload
+            : ParsingState.Complete;
 
-            break;
-          }
+          break;
+        }
+        case ParsingState.Payload: {
           // TODO: optimize payload reading from stream
-          case ParsingState.Payload: {
-            // payloadSize = (payload + header) - header
-            const payloadSize =
-              (signatureHeader.entries.get(1000)?.data as number) -
-              (16 +
-                mainHeader.index.numberOfEntries * 16 +
-                mainHeader.index.sectionSize +
-                ((8 - (mainHeader.index.sectionSize % 8)) % 8));
 
-            if (bytebuf.unreadBytes < payloadSize) return;
+          //payloadSize = (payload + header) - header
+          const payloadSize =
+            (this.signatureHeader!.entries.get(1000)?.data as number) -
+            (16 +
+              this.mainHeader!.index.numberOfEntries * 16 +
+              this.mainHeader!.index.sectionSize +
+              ((8 - (this.mainHeader!.index.sectionSize % 8)) % 8));
 
-            payload = bytebuf.readBuffer(payloadSize);
-            state = ParsingState.Complete;
+          if (this.bytebuf.unreadBytes < payloadSize) return false;
 
-            // bytebuf.unreadBytes must be 0?
-            break;
-          }
+          this.payload = this.bytebuf.readBuffer(payloadSize);
+          this.state = ParsingState.Complete;
+
+          // bytebuf.unreadBytes must be 0?
+          break;
         }
       }
+    }
 
-      controller.enqueue({
-        lead,
-        signature: signatureHeader,
-        header: mainHeader,
-        payload,
-      });
-    },
-  });
+    return true;
+  }
+
+  getRawPackage(): RawPackage {
+    return {
+      lead: this.lead!,
+      signature: this.signatureHeader!,
+      header: this.mainHeader!,
+      payload: this.payload,
+    };
+  }
+
+  /** Create a `TransformStream` object to parse input bytes into `RawPackage`. */
+  toWebTransformer(): TransformStream<Buffer, RawPackage> {
+    const transform = (
+      chunk: Buffer,
+      controller: TransformStreamDefaultController
+    ) => {
+      if (this.read(chunk)) controller.enqueue(this.getRawPackage());
+    };
+
+    return new TransformStream({
+      transform(chunk, controller) {
+        transform(chunk, controller);
+      },
+    });
+  }
 }
 
 enum ParsingState {

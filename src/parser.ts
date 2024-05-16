@@ -2,6 +2,7 @@ import { RpmPackageView } from "./package_view";
 import { DependencyTag, InfoTag, OtherTag } from "./tags";
 import { StreamParser } from "./stream_parser";
 import { parseBuffer } from "./sync_parser";
+import { ParseLeadOptions } from "./lead";
 
 /** RPM package parsing options. */
 export interface ParseRpmPackageOptions {
@@ -22,10 +23,10 @@ export interface ParseRpmPackageOptions {
  */
 export function parseRpmPackageSync(
   uint8Array: Uint8Array,
-  options?: ParseRpmPackageOptions,
+  options?: ParseRpmPackageOptions
 ): RpmPackageView {
   return new RpmPackageView(
-    parseBuffer(uint8Array.buffer, expandOptions(options)),
+    parseBuffer(uint8Array.buffer, expandOptions(options))
   );
 }
 
@@ -34,17 +35,24 @@ export function parseRpmPackageSync(
  */
 export async function parseRpmPackage(
   stream: ReadableStream,
-  options?: ParseRpmPackageOptions,
+  options?: ParseRpmPackageOptions
 ): Promise<RpmPackageView> {
+  const { leadOptions, capturePayload, headerOptions } = expandOptions(options);
+
   const reader = stream
-    .pipeThrough(StreamParser(expandOptions(options)))
+    .pipeThrough(
+      new StreamParser(
+        leadOptions,
+        headerOptions,
+        capturePayload
+      ).toWebTransformer()
+    )
     .getReader();
 
-  const rawPackage = await reader.read();
-  return new RpmPackageView(rawPackage.value!);
+  return new RpmPackageView((await reader.read()).value!);
 }
 
-function expandOptions(options?: ParseRpmPackageOptions): object {
+function expandOptions(options?: ParseRpmPackageOptions) {
   const setTags = new Set(options?.select?.tags);
 
   return {
@@ -52,7 +60,7 @@ function expandOptions(options?: ParseRpmPackageOptions): object {
     leadOptions: {
       withoutName: options?.capture?.filename ? undefined : true,
       rawName: options?.capture?.filename === "raw" ? true : undefined,
-    },
+    } as ParseLeadOptions,
     headerOptions: {
       selectByTag: options?.select?.tags
         ? // Is `Set.has` fast enough?
