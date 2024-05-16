@@ -1,55 +1,45 @@
 # rpm-parser
 
-RPM v3 package metadata parser in TypeScript.
+RPM v3 package metadata parser in TypeScript with support for partial sync/stream parsing.
 
-## Overview
+## Usage
+
+Basic.
 
 ```ts
 import { parseRpmPackage } from "@dx3mod/rpm-parser";
+
+const packageView = await parseRpmPackage(blob.stream());
+
+packageView.name; // string
+packageView.buildTime; // Date
+
+packageView.raw.signature.entries.get(1004); // Entry
 ```
 
-High-level user API
+Partial parsing.
 
 ```ts
-// parse from stream in chunks
-const pkg = await parseRpmPackage(blob.stream());
-
-pkg.name; // string
-pkg.buildTime; // Date
-```
-
-with direct access
-
-```ts
-pkg.raw.signature.entries.get(1004); // Entry
-```
-
-and partial parsing.
-
-```ts
-parseRpmPackage(
-  stream,
-  {
-    // partial parsing of necessary header entries
-    select: {
-      tags: [
-        InfoTag.Name,
-        InfoTag.Os,
-        InfoTag.Arch,
-        InfoTag.Summery,
-        InfoTag.Size,
-      ],
-    },
-    capture: {
-      payload: true,
-    },
+parseRpmPackage(stream, {
+  // partial parsing of necessary header entries
+  select: {
+    tags: [
+      InfoTag.Name,
+      InfoTag.Os,
+      InfoTag.Arch,
+      InfoTag.Summery,
+      InfoTag.Size,
+    ],
   },
-);
+  capture: {
+    payload: true,
+  },
+});
 ```
 
-<!-- ## Documentation
+## See also
 
-- [API reference](https://jsr.io/@dx3mod/rpm-parser/doc) -->
+- [fastify-rpm-parser](https://github.com/dx3mod/fastify-rpm-parser)
 
 ## References
 
