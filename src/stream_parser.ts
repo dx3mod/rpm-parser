@@ -8,15 +8,15 @@ export class StreamParser {
   private state: ParsingState;
   private bytebuf: ByteBuf;
 
-  private lead?: Lead;
+  public lead?: Lead;
 
-  private signatureIndex?: header.Index;
-  private signatureHeader?: RawPackageHeader;
+  public signatureIndex?: header.Index;
+  public signatureHeader?: RawPackageHeader;
 
-  private headerIndex?: header.Index;
-  private mainHeader?: RawPackageHeader;
+  public headerIndex?: header.Index;
+  public mainHeader?: RawPackageHeader;
 
-  private payload?: ArrayBuffer;
+  public payload?: ArrayBuffer;
 
   constructor(
     private readonly leadParserOptions?: ParseLeadOptions,

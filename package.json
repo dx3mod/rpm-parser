@@ -1,6 +1,6 @@
 {
   "name": "@dx3mod/rpm-parser",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "RPM v3 package metadata parser",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
